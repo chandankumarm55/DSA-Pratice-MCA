@@ -1,81 +1,56 @@
-#!/bin/python3
-
-import math
-import os
-import random
-import re
-import sys
-
-#
-# Complete the 'waiter' function below.
-#
-# The function is expected to return an INTEGER_ARRAY.
-# The function accepts following parameters:
-#  1. INTEGER_ARRAY number
-#  2. INTEGER q
-#
+def get_prime():
+    """Function to get prime numbers from 2 to 10^4"""
+    prime = []
+    lower = 2
+    upper = 10000
+    
+    for i in range(lower, upper):
+        is_prime = True
+        for j in range(2, int(i**0.5) + 1):
+            if i % j == 0:
+                is_prime = False
+                break
+        
+        if is_prime:
+            prime.append(i)
+    
+    return prime
 
 def waiter(number, q):
-    # Function to generate the first q prime numbers
-    def generate_primes(n):
-        primes = []
-        num = 2
-        while len(primes) < n:
-            is_prime = True
-            for p in primes:
-                if p * p > num:
-                    break
-                if num % p == 0:
-                    is_prime = False
-                    break
-            if is_prime:
-                primes.append(num)
-            num += 1
-        return primes
-
     result = []
-    primes = generate_primes(q)
-    A = number[::-1]  # Reverse the input to simulate stack behavior
-
+    prime = get_prime()  # assign all prime numbers to array
+    
     for i in range(q):
-        prime = primes[i]
-        A_next = []
-        B = []
-
-        # Process all plates in current A
-        while A:
-            plate = A.pop()
-            if plate % prime == 0:
-                B.append(plate)
+        str_a = []
+        str_b = []
+        
+        while number:
+            num = number.pop()
+            
+            # if the number is divisible by the prime number, store it to stack str_b
+            # if not, store it to stack str_a
+            if num % prime[i] == 0:
+                str_b.append(num)
             else:
-                A_next.append(plate)
-
-        # Add B (top to bottom) to result
-        while B:
-            result.append(B.pop())
-
-        A = A_next
-
-    # After q iterations, add remaining A stack (top to bottom)
-    while A:
-        result.append(A.pop())
-
+                str_a.append(num)
+        
+        number = str_a  # do the iteration with numbers in str_a
+        
+        # move the str_b stack values to the result stack
+        while str_b:
+            result.append(str_b.pop())
+    
+    # if the number stack is not empty after all iterations, move it to result stack
+    while number:
+        result.append(number.pop())
+    
     return result
 
-
-if __name__ == '__main__':
-    fptr = open(os.environ['OUTPUT_PATH'], 'w')
-
-    first_multiple_input = input().rstrip().split()
-
-    n = int(first_multiple_input[0])
-    q = int(first_multiple_input[1])
-
-    number = list(map(int, input().rstrip().split()))
-
+if __name__ == "__main__":
+    n, q = map(int, input().split())
+    number = list(map(int, input().split()))
+    
     result = waiter(number, q)
-
-    fptr.write('\n'.join(map(str, result)))
-    fptr.write('\n')
-
-    fptr.close()
+    
+    for num in result:
+        print(num)
